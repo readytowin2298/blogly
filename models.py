@@ -23,3 +23,7 @@ class Users(db.Model):
     last_name = db.Column(db.String,
                     nullable=False)
     image_url = db.Column(db.String)
+
+    def get_full_name(self):
+        full_name = self.first_name + " " + self.last_name
+        return full_name

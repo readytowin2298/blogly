@@ -14,14 +14,18 @@ db.create_all()
 
 @app.route('/')
 def home_page():
+    return redirect('/users')
+
+@app.route('/users', methods=["GET"])
+def list_users():
     users = Users.query.all()
     return render_template('base.html', users=users)
 
-@app.route('/add_user')
+@app.route('/users/new', methods=["GET"])
 def present_form():
     return render_template('form.html')
 
-@app.route('/form', methods=['POST'])
+@app.route('/users/new', methods=['POST'])
 def add_user():
     first_name = request.form['first_name']
     last_name = request.form['last_name']
@@ -30,9 +34,32 @@ def add_user():
     db.session.add(user)
     db.session.commit()
 
-    return redirect(f'/profile/{user.id}')
+    return redirect(f'/users/{user.id}')
 
-@app.route('/profile/<int:id>')
+@app.route('/users/<int:id>')
 def profile(id):
     user = Users.query.get_or_404(id)
     return render_template('profile.html', user=user)
+
+@app.route('/users/<int:id>/edit', methods=["GET"])
+def get_edit(id):
+    user = Users.query.get_or_404(id)
+    return render_template('profile_edit.html', user=user)
+
+@app.route('/users/<int:id>/edit', methods=['POST'])
+def update_user(id):
+    user = Users.query.get_or_404(id)
+    user.first_name = request.form['first_name']
+    user.last_name = request.form['last_name']
+    user.image_url = request.form['image_url']
+
+    db.session.add(user)
+    db.session.commit()
+
+    return redirect(f'/users/{id}')
+
+@app.route('/users/<int:id>/delete')
+def delete_user(id):
+    Users.query.filter_by(id=id).delete()
+    db.session.commit()
+    return redirect('/')

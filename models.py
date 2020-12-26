@@ -27,3 +27,4 @@ class Users(db.Model):
     def get_full_name(self):
         full_name = self.first_name + " " + self.last_name
         return full_name
+
